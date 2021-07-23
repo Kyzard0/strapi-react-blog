@@ -1,0 +1,37 @@
+version: '3'
+
+volumes:
+  db_dev: {}
+
+services:
+
+  backend:
+    build: ./strapi-blog-server
+    container_name: strapi-blog-server
+    command: yarn develop
+    restart: always
+    volumes:
+      - ./strapi-blog-server:/usr/src/app # Link container volume to local files
+    env_file: .env
+    depends_on:
+      - database
+    ports:
+      - "1337:1337"
+  
+  database:
+    image: postgres:12.7
+    restart: on-failure
+    container_name: strapi-blog-db
+    env_file: .env
+    volumes:
+        - db_dev:/var/lib/postgresql/data
+    expose:
+      - 5432
+
+  # nginx:
+  #   build: ./nginx
+  #   ports:
+  #     - 81:80
+  #   depends_on:
+  #     - backend
+  #     - frontend
